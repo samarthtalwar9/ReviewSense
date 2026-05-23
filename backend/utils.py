@@ -1,21 +1,37 @@
 import re
+import nltk
+from nltk.corpus import stopwords
+
+# Quietly download standard NLTK stopwords resource package if missing
+try:
+    nltk.data.find("corpora/stopwords")
+except LookupError:
+    nltk.download("stopwords", quiet=True)
+
+STOP_WORDS = set(stopwords.words("english"))
 
 def preprocess_text(text: str) -> str:
     """
-    Cleans and normalizes review text for sentiment analysis.
-    Converts to lowercase, removes special characters/punctuation,
-    and strips redundant whitespace.
+    Cleans raw review text using NLP techniques:
+    - Lowercase conversion
+    - Special characters & punctuation scrubbing
+    - NLTK English stopword removal
+    - Extra spacing compression
     """
     if not text:
         return ""
     
-    # Convert to lowercase
+    # 1. Lowercase conversion
     text = text.lower()
     
-    # Remove punctuation, numbers, and special characters (preserving spaces)
-    text = re.sub(r'[^a-zA-Z\s]', '', text)
+    # 2. Punctuation cleaning & alphabetic matching
+    text = re.sub(r"[^a-zA-Z\s]", "", text)
     
-    # Normalize whitespaces
-    text = re.sub(r'\s+', ' ', text).strip()
+    # 3. Tokenize words
+    words = text.split()
     
-    return text
+    # 4. Stopword removal using NLTK stopwords dictionary
+    filtered_words = [word for word in words if word not in STOP_WORDS]
+    
+    # 5. Rejoin and trim excessive whitespace
+    return " ".join(filtered_words).strip()
