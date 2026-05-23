@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════
    REVIEWSENSE — JavaScript
-   AI Sentiment Dashboard Logic (Production-Ready)
+   AI Sentiment Dashboard Logic (Production-Ready Polished)
    ═══════════════════════════════════════════════ */
 
 /* ── PARTICLE CANVAS ─────────────────────────── */
@@ -9,6 +9,7 @@
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   let particles = [];
+  let animationFrameId = null;
 
   const resize = () => {
     canvas.width = window.innerWidth;
@@ -47,14 +48,25 @@
     }
   }
 
-  for (let i = 0; i < 80; i++) particles.push(new Particle());
+  // Generate particles based on performance profiles
+  const maxParticles = window.innerWidth < 640 ? 40 : 80;
+  for (let i = 0; i < maxParticles; i++) particles.push(new Particle());
 
   const animate = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     particles.forEach(p => { p.update(); p.draw(); });
-    requestAnimationFrame(animate);
+    animationFrameId = requestAnimationFrame(animate);
   };
   animate();
+
+  // Clean up animation on visibility change to save CPU/GPU cycles
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      cancelAnimationFrame(animationFrameId);
+    } else {
+      animate();
+    }
+  });
 })();
 
 /* ── SIDEBAR TOGGLE ──────────────────────────── */
@@ -139,6 +151,7 @@ const showToast = (title, message, type = 'success') => {
 
   container.appendChild(toast);
 
+  // Smooth slide out
   setTimeout(() => {
     toast.classList.add('fade-out');
     setTimeout(() => {
@@ -259,7 +272,7 @@ const animateRing = (pct) => {
   const animPct = (timestamp) => {
     if (!start) start = timestamp;
     const prog = Math.min((timestamp - start) / 800, 1);
-    const ease = 1 - Math.pow(1 - prog, 3);
+    const ease = 1 - Math.pow(1 - prog, 3); // Cubic ease out
     const val = Math.floor(current + (pct - current) * ease);
     pctEl.textContent = val + '%';
     if (prog < 1) requestAnimationFrame(animPct);
@@ -392,6 +405,7 @@ const analyze = async () => {
     btn.disabled = true;
   }
 
+  // Trigger smooth card shimmers
   cards.forEach(card => card.classList.add('shimmering'));
 
   let sentimentVal = '';
@@ -399,6 +413,10 @@ const analyze = async () => {
   let success = false;
 
   const url = getApiUrl();
+  
+  // Abort controller for timeouts
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
 
   try {
     const response = await fetch(url, {
@@ -406,20 +424,35 @@ const analyze = async () => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ review: text })
+      body: JSON.stringify({ review: text }),
+      signal: controller.signal
     });
+
+    clearTimeout(timeoutId);
 
     if (response.ok) {
       const data = await response.json();
-      sentimentVal = data.sentiment; 
-      confidenceVal = parseFloat(data.confidence);
-      success = true;
+      
+      // Response validation
+      if (data && typeof data.sentiment === 'string' && typeof data.confidence === 'number') {
+        sentimentVal = data.sentiment;
+        confidenceVal = data.confidence;
+        success = true;
+      } else {
+        throw new Error('Response missing required sentiment or confidence parameters.');
+      }
     } else {
-      throw new Error(`Server returned status: ${response.status}`);
+      throw new Error(`Server returned HTTP ${response.status}`);
     }
   } catch (error) {
+    clearTimeout(timeoutId);
     console.error('API connection failure:', error);
-    showToast('Connection Error', 'Could not reach the AI sentiment service. Please verify backend is running.', 'error');
+    
+    if (error.name === 'AbortError') {
+      showToast('API Timeout', 'The analysis request timed out. Please try again.', 'error');
+    } else {
+      showToast('Connection Error', 'Could not reach the AI sentiment service. Ensure backend is running.', 'error');
+    }
   }
 
   if (success) {
@@ -441,6 +474,7 @@ const analyze = async () => {
       negPct = 100 - neutPct - posPct;
     }
 
+    // Update state
     state.totalAnalyses += 1;
     state.reviewsToday += 1;
     state.totalConfidence += confidence;
@@ -465,10 +499,12 @@ const analyze = async () => {
 
     saveState();
 
+    // Reset input text
     textarea.value = '';
     charCount.textContent = '0';
     textareaContainer?.classList.remove('typing');
 
+    // Rerender layout
     updateMetrics();
     
     const sentimentEmojiLabel = category === 'positive' ? '😊 Positive' : category === 'negative' ? '😠 Negative' : '😐 Neutral';
@@ -481,6 +517,7 @@ const analyze = async () => {
     showToast('Analysis Succeeded', `Sentiment: ${sentimentVal} (${confidence}% Conf)`, 'success');
   }
 
+  // Clear loading indicators
   if (btn && loading) {
     btn.classList.remove('loading');
     loading.classList.remove('active');

@@ -1,18 +1,25 @@
-# ReviewSense — AI Sentiment Intelligence Dashboard
+# 🔮 ReviewSense — AI Sentiment Intelligence Dashboard
 
-ReviewSense is a production-level, high-performance AI Sentiment Intelligence dashboard designed to analyze and visualize customer review polarities in real-time. Built with a futuristic glassmorphic UI aesthetic, it features a modular architecture separating a pure frontend dashboard from a FastAPI deep-learning prediction server.
+[![Vercel Deployment](https://img.shields.io/badge/Frontend-Vercel-black?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com)
+[![Render Deployment](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://render.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)](LICENSE)
+[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![Scikit-Learn](https://img.shields.io/badge/scikit_learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)](https://scikit-learn.org)
+
+ReviewSense is a production-level, high-performance AI Sentiment Intelligence dashboard designed to analyze, track, and visualize customer review polarities in real-time. Built with a futuristic glassmorphic UI design system, it features a modular architecture separating a clean client-side dashboard from a FastAPI deep-learning prediction server.
 
 ---
 
 ## 🚀 Features
 
-- **Futuristic Cinematic UI:** Glassmorphism design system featuring interactive ambient particles, smooth SVG neon animations, and responsive dashboard grid.
+- **Futuristic Cinematic UI:** Implements custom glassmorphism design tokens, interactive ambient canvas particles, smooth SVG neon animations, and responsive dashboards.
 - **Real-Time Sentiment Classification:** Predicts `Positive`, `Negative`, and `Neutral` sentiments with precision probability confidence metrics.
 - **Dynamic Metrics Engine:** Live trackers indicating **Total Analyses**, **Positive Rate**, **Average Confidence**, and **Reviews Today** with zero state layouts.
 - **Bezier Trend Charts:** Canvas-rendered weekly data charting curves showing sentiment distribution movements.
 - **Local Persistence:** Retains full application states, analysis histories, and daily stats charts between page loads using `localStorage`.
 - **Flexible Cross-Origin Operations:** Built-in CORS routing on the backend API allowing multi-domain web communication (e.g. Vercel frontend + Render backend).
 - **Intelligent API Config Resolver:** Automatically switches between dev localhost endpoints and deployed cloud hosts depending on the environment.
+- **Robust Exception Handling:** Integrated `AbortController` request timeout monitoring (8s limit) and detailed network exception visual alerts.
 
 ---
 
@@ -21,7 +28,7 @@ ReviewSense is a production-level, high-performance AI Sentiment Intelligence da
 ### Frontend
 - **Structure:** Semantic HTML5
 - **Styling:** Custom Vanilla CSS3 (Custom Variables, Keyframe Animations, Glassmorphism Filters)
-- **Logic:** Vanilla ES6+ JavaScript (HTML5 Canvas Engine, Fetch API, LocalStorage Interface)
+- **Logic:** Vanilla ES6+ JavaScript (HTML5 Canvas Engine, Fetch API, LocalStorage Interface, AbortController)
 
 ### Backend
 - **Framework:** FastAPI (Python 3.10+)
@@ -155,7 +162,7 @@ Ensure you have **Python 3.9+** and a modern web browser installed.
 2. Configure the **Build & Development Settings**:
    - **Framework Preset:** `Other` (Static HTML site)
    - **Root Directory:** `frontend/`
-3. If deploying the backend separately, you can override the target endpoint by adding the backend's Render/cloud URL to `localStorage` under `reviewsense_api_url` in your browser console, or by hardcoding your API URL in `frontend/script.js`:
+3. If deploying the backend separately, you can override the target endpoint by adding the backend's Render/cloud URL to `localStorage` under `reviewsense_api_url` in your browser console:
    ```javascript
    localStorage.setItem('reviewsense_api_url', 'https://your-backend-service.onrender.com/predict');
    ```
@@ -182,5 +189,10 @@ Ensure you have **Python 3.9+** and a modern web browser installed.
 
 ## 💳 Credits
 
-- Developed by **Samarth Talwar**.
-- Designed with modern glassmorphism web standards.
+Developed by **Samarth Talwar**.
+
+---
+
+<p align="center">
+  <b>Project by Samarth Talwar</b>
+</p>
