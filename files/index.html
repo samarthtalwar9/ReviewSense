@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReviewSense — AI Sentiment Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- AMBIENT BACKGROUND                         -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="bg-canvas">
+  <div class="aurora aurora-1"></div>
+  <div class="aurora aurora-2"></div>
+  <div class="aurora aurora-3"></div>
+  <canvas id="particle-canvas"></canvas>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- MOBILE OVERLAY                             -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SIDEBAR                                    -->
+<!-- ═══════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <!-- Logo -->
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <path d="M11 2L20 7V15L11 20L2 15V7L11 2Z" stroke="url(#logoGrad)" stroke-width="1.5" fill="none"/>
+        <circle cx="11" cy="11" r="3" fill="url(#logoGrad)"/>
+        <defs>
+          <linearGradient id="logoGrad" x1="2" y1="2" x2="20" y2="20">
+            <stop stop-color="#ff2d78"/>
+            <stop offset="1" stop-color="#7c3aed"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <span class="logo-text">ReviewSense</span>
+  </div>
+
+  <!-- Nav Items -->
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">WORKSPACE</div>
+    <a href="#" class="nav-item active" data-page="dashboard">
+      <span class="nav-icon">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <rect x="1" y="1" width="6" height="6" rx="1.5"/>
+          <rect x="9" y="1" width="6" height="6" rx="1.5"/>
+          <rect x="1" y="9" width="6" height="6" rx="1.5"/>
+          <rect x="9" y="9" width="6" height="6" rx="1.5"/>
+        </svg>
+      </span>
+      <span class="nav-label">Dashboard</span>
+      <span class="nav-badge">4</span>
+    </a>
+    <a href="#" class="nav-item" data-page="analyses">
+      <span class="nav-icon">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M2 12L5 8L8 10L11 5L14 7"/>
+          <path d="M2 14H14"/>
+        </svg>
+      </span>
+      <span class="nav-label">Analyses</span>
+    </a>
+    <a href="#" class="nav-item" data-page="integrations">
+      <span class="nav-icon">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="4" cy="8" r="2.5"/>
+          <circle cx="12" cy="4" r="2.5"/>
+          <circle cx="12" cy="12" r="2.5"/>
+          <path d="M6.5 8H9.5M6.5 6.5L9.5 4.5M6.5 9.5L9.5 11.5"/>
+        </svg>
+      </span>
+      <span class="nav-label">Integrations</span>
+    </a>
+
+    <div class="nav-section-label" style="margin-top:24px;">INSIGHTS</div>
+    <a href="#" class="nav-item" data-page="reports">
+      <span class="nav-icon">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="2" width="12" height="12" rx="2"/>
+          <path d="M5 6H11M5 8H9M5 10H7"/>
+        </svg>
+      </span>
+      <span class="nav-label">Reports</span>
+    </a>
+    <a href="#" class="nav-item" data-page="settings">
+      <span class="nav-icon">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="2.5"/>
+          <path d="M8 1.5V3M8 13V14.5M1.5 8H3M13 8H14.5M3.4 3.4L4.4 4.4M11.6 11.6L12.6 12.6M3.4 12.6L4.4 11.6M11.6 4.4L12.6 3.4"/>
+        </svg>
+      </span>
+      <span class="nav-label">Settings</span>
+    </a>
+    <a href="#" class="nav-item" data-page="support">
+      <span class="nav-icon">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6"/>
+          <path d="M6.5 6.5C6.5 5.7 7.2 5 8 5C8.8 5 9.5 5.7 9.5 6.5C9.5 7.3 8.8 8 8 8V9.5"/>
+          <circle cx="8" cy="11.5" r="0.5" fill="currentColor"/>
+        </svg>
+      </span>
+      <span class="nav-label">Support</span>
+    </a>
+  </nav>
+
+  <!-- Upgrade Card -->
+  <div class="upgrade-card">
+    <div class="upgrade-glow"></div>
+    <div class="upgrade-icon">⚡</div>
+    <div class="upgrade-title">Upgrade to Pro</div>
+    <div class="upgrade-desc">Unlock unlimited analyses & team features</div>
+    <button class="upgrade-btn">Go Pro</button>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- MAIN CONTENT                               -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="main-wrapper">
+
+  <!-- TOP NAVBAR -->
+  <header class="navbar">
+    <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <div class="navbar-search">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="6" cy="6" r="4.5"/>
+        <path d="M9.5 9.5L13 13"/>
+      </svg>
+      <input type="text" placeholder="Search reviews, analyses…" />
+      <kbd>⌘K</kbd>
+    </div>
+
+    <div class="navbar-actions">
+      <button class="nav-action-btn" aria-label="Notifications">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M8 1.5C5.5 1.5 3.5 3.5 3.5 6V9L2 11H14L12.5 9V6C12.5 3.5 10.5 1.5 8 1.5Z"/>
+          <path d="M6.5 11C6.5 11.8 7.2 12.5 8 12.5C8.8 12.5 9.5 11.8 9.5 11"/>
+        </svg>
+        <span class="notif-dot"></span>
+      </button>
+      <button class="nav-action-btn" aria-label="Messages">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M2 3H14C14.6 3 15 3.4 15 4V10C15 10.6 14.6 11 14 11H4L1 14V4C1 3.4 1.4 3 2 3Z"/>
+        </svg>
+      </button>
+      <div class="nav-divider"></div>
+      <div class="user-avatar">
+        <div class="avatar-ring"></div>
+        <div class="avatar-inner">S</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="content-area">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-eyebrow">AI Sentiment Engine</div>
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">Real-time review analysis powered by deep language intelligence</p>
+      </div>
+      <div class="page-header-right">
+        <div class="live-indicator">
+          <span class="live-dot"></span>
+          <span>Live</span>
+        </div>
+        <button class="btn-secondary">Export Report</button>
+      </div>
+    </div>
+
+    <!-- STAT CARDS ROW -->
+    <div class="stat-cards-grid">
+      <div class="stat-card" data-index="0">
+        <div class="stat-card-glow"></div>
+        <div class="stat-card-header">
+          <span class="stat-label">Total Analyses</span>
+          <div class="stat-icon-wrap positive">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 10L5 6L8 8L12 3"/></svg>
+          </div>
+        </div>
+        <div class="stat-value" id="totalAnalyses">00</div>
+        <div class="stat-change neutral" id="totalAnalysesTrend">Waiting for data</div>
+      </div>
+      <div class="stat-card" data-index="1">
+        <div class="stat-card-glow negative-glow"></div>
+        <div class="stat-card-header">
+          <span class="stat-label">Positive Rate</span>
+          <div class="stat-icon-wrap positive">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"/><path d="M4.5 8.5C5 9.5 6 10 7 10C8 10 9 9.5 9.5 8.5"/><circle cx="5" cy="5.5" r="0.8" fill="currentColor"/><circle cx="9" cy="5.5" r="0.8" fill="currentColor"/></svg>
+          </div>
+        </div>
+        <div class="stat-value pink-val" id="positiveRate">0%</div>
+        <div class="stat-change neutral" id="positiveRateTrend">Waiting for data</div>
+      </div>
+      <div class="stat-card" data-index="2">
+        <div class="stat-card-glow purple-glow"></div>
+        <div class="stat-card-header">
+          <span class="stat-label">Avg Confidence</span>
+          <div class="stat-icon-wrap purple">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1L8.5 5H13L9.5 7.5L11 12L7 9.5L3 12L4.5 7.5L1 5H5.5L7 1Z"/></svg>
+          </div>
+        </div>
+        <div class="stat-value purple-val" id="avgConfidence">0%</div>
+        <div class="stat-change neutral" id="avgConfidenceTrend">Waiting for data</div>
+      </div>
+      <div class="stat-card" data-index="3">
+        <div class="stat-card-glow blue-glow"></div>
+        <div class="stat-card-header">
+          <span class="stat-label">Reviews Today</span>
+          <div class="stat-icon-wrap blue">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="12" height="10" rx="1.5"/><path d="M4 6H10M4 8.5H7"/></svg>
+          </div>
+        </div>
+        <div class="stat-value blue-val" id="reviewsToday">00</div>
+        <div class="stat-change neutral" id="reviewsTodayTrend">Waiting for data</div>
+      </div>
+    </div>
+
+    <!-- MIDDLE SECTION: Input + Confidence -->
+    <div class="middle-grid">
+
+      <!-- REVIEW INPUT PANEL -->
+      <div class="glass-card input-panel">
+        <div class="card-float-bg"></div>
+        <div class="input-panel-header">
+          <div>
+            <div class="card-eyebrow">NEURAL ANALYSIS</div>
+            <h2 class="card-title">AI Review Input</h2>
+          </div>
+          <button class="icon-btn" title="Upload file">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M7.5 10V2M4 5L7.5 2L11 5"/>
+              <path d="M2 11V12.5C2 13.1 2.4 13.5 3 13.5H12C12.6 13.5 13 13.1 13 12.5V11"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Sample chips -->
+        <div class="sample-chips">
+          <div class="chips-label">Try a sample:</div>
+          <div class="chips-row">
+            <button class="chip" data-sentiment="positive" data-text="Love this product! Absolutely amazing quality and super fast delivery. Will definitely buy again!">Love this product! 😍</button>
+            <button class="chip" data-sentiment="negative" data-text="Worst purchase ever. Complete waste of money. Broke after two days and support was useless.">Worst purchase ever 💢</button>
+            <button class="chip" data-sentiment="neutral" data-text="It's okay I guess. Nothing special but does the job. Average experience overall.">It's okay 🤷</button>
+            <button class="chip" data-sentiment="positive" data-text="Fast delivery! Arrived next day, packaging was great. Product looks exactly like the photos.">Fast delivery! 🚀</button>
+          </div>
+        </div>
+
+        <div class="textarea-container">
+          <div class="textarea-glow"></div>
+          <textarea id="reviewInput" placeholder="Paste or type your review here…" maxlength="1000"></textarea>
+        </div>
+        <div class="textarea-footer">
+          <span class="char-counter"><span id="charCount">0</span> / 1000</span>
+          <span class="textarea-hint">Press Ctrl+Enter to analyze</span>
+        </div>
+
+        <button class="analyze-btn" id="analyzeBtn">
+          <span class="btn-shine"></span>
+          <span class="btn-content">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M8 1L9.5 6H15L10.5 9L12 14L8 11L4 14L5.5 9L1 6H6.5L8 1Z"/>
+            </svg>
+            Analyze Sentiment
+          </span>
+          <span class="btn-loading" id="btnLoading">
+            <span class="spinner"></span>
+            Analyzing…
+          </span>
+        </button>
+      </div>
+
+      <!-- RIGHT COLUMN: Confidence + Mini Chart -->
+      <div class="right-col">
+
+        <!-- Confidence Ring -->
+        <div class="glass-card confidence-card">
+          <div class="card-eyebrow">CONFIDENCE SCORE</div>
+          <div class="confidence-ring-wrap">
+            <svg class="ring-svg" viewBox="0 0 120 120">
+              <circle class="ring-bg" cx="60" cy="60" r="50" fill="none" stroke-width="8"/>
+              <circle class="ring-progress" id="confidenceRing" cx="60" cy="60" r="50" fill="none" stroke-width="8"
+                stroke-dasharray="314" stroke-dashoffset="314"
+                stroke-linecap="round" transform="rotate(-90 60 60)"/>
+              <defs>
+                <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ff2d78"/>
+                  <stop offset="100%" stop-color="#7c3aed"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="ring-center">
+              <div class="ring-pct" id="confidencePct">0%</div>
+              <div class="ring-label">Confidence</div>
+            </div>
+          </div>
+          <div class="confidence-bars">
+            <div class="conf-row">
+              <span>Positive</span>
+              <div class="conf-bar-track"><div class="conf-bar-fill positive-fill" id="posBar" style="width:0%"></div></div>
+              <span class="conf-pct" id="posPct">—</span>
+            </div>
+            <div class="conf-row">
+              <span>Negative</span>
+              <div class="conf-bar-track"><div class="conf-bar-fill negative-fill" id="negBar" style="width:0%"></div></div>
+              <span class="conf-pct" id="negPct">—</span>
+            </div>
+            <div class="conf-row">
+              <span>Neutral</span>
+              <div class="conf-bar-track"><div class="conf-bar-fill neutral-fill" id="neutBar" style="width:0%"></div></div>
+              <span class="conf-pct" id="neutPct">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sentiment Result -->
+        <div class="glass-card result-card" id="resultCard">
+          <div class="card-eyebrow">ANALYSIS RESULT</div>
+          <div class="result-placeholder" id="resultPlaceholder">
+            <div class="placeholder-glow"></div>
+            <div class="placeholder-icon-wrap">
+              <svg class="placeholder-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="9" stroke-dasharray="4 4" class="scanning-circle"/>
+                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" opacity="0.2"/>
+                <path d="M12 8V12L15 15" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="placeholder-title">No analysis yet</div>
+            <div class="placeholder-desc">Waiting for AI review input</div>
+          </div>
+          <div class="result-content hidden" id="resultContent">
+            <div class="result-sentiment" id="resultSentiment"></div>
+            <div class="result-summary" id="resultSummary"></div>
+            <div class="result-tags" id="resultTags"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- BOTTOM SECTION: Chart + History -->
+    <div class="bottom-grid">
+
+      <!-- ANALYTICS CHART -->
+      <div class="glass-card chart-card">
+        <div class="chart-card-glow"></div>
+        <div class="chart-header">
+          <div>
+            <div class="card-eyebrow">WEEKLY OVERVIEW</div>
+            <h3 class="card-title-sm">Sentiment Trends</h3>
+          </div>
+          <div class="chart-legend">
+            <span class="legend-dot positive-dot"></span><span>Positive</span>
+            <span class="legend-dot negative-dot"></span><span>Negative</span>
+            <span class="legend-dot neutral-dot"></span><span>Neutral</span>
+          </div>
+        </div>
+        <div class="chart-area">
+          <canvas id="sentimentChart"></canvas>
+        </div>
+      </div>
+
+      <!-- REVIEW HISTORY -->
+      <div class="glass-card history-card">
+        <div class="history-header">
+          <div>
+            <div class="card-eyebrow">ACTIVITY LOG</div>
+            <h3 class="card-title-sm">Recent Reviews</h3>
+          </div>
+          <button class="btn-ghost">View All</button>
+        </div>
+        <div class="history-list" id="historyList">
+          <div class="history-empty" id="historyEmpty">
+            <div class="empty-icon-wrap">
+              <svg class="empty-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15" stroke-linecap="round"/>
+                <rect x="9" y="3" width="6" height="4" rx="1" stroke-linecap="round"/>
+                <path d="M9 12H15M9 16H13" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="empty-title">History Empty</div>
+            <div class="empty-desc">Your analyses will appear here</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-divider"></div>
+    <div class="footer-content">
+      <p class="footer-text">Project by <span class="footer-name">Samarth Talwar</span></p>
+    </div>
+  </footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
