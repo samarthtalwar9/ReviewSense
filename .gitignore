@@ -1,7 +1,41 @@
-# OS metadata files
+# OS files
 .DS_Store
 Thumbs.db
 desktop.ini
+$RECYCLE.BIN/
+
+# Python - Compiled files and caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Python - Environments and virtualenvs
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
 
 # IDE files
 .vscode/
@@ -11,3 +45,17 @@ desktop.ini
 *.njsproj
 *.sln
 *.sw?
+
+# Node/JavaScript dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Application generated files (local testing pickles can be committed or ignored, but usually in simple portfolios they are committed so the model works instantly)
+# We will NOT ignore model.pkl and vectorizer.pkl so the repo is immediately deployment-ready on Render out of the box!
+# but let's ignore local workspace scratch or temp files
+.gemini/
+artifacts/
+logs/

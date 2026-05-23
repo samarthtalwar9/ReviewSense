@@ -1,11 +1,12 @@
 /* ═══════════════════════════════════════════════
    REVIEWSENSE — JavaScript
-   AI Sentiment Dashboard Logic
-═══════════════════════════════════════════════ */
+   AI Sentiment Dashboard Logic (Production-Ready)
+   ═══════════════════════════════════════════════ */
 
 /* ── PARTICLE CANVAS ─────────────────────────── */
 (function initParticles() {
   const canvas = document.getElementById('particle-canvas');
+  if (!canvas) return;
   const ctx = canvas.getContext('2d');
   let particles = [];
 
@@ -46,7 +47,6 @@
     }
   }
 
-  // Create particles
   for (let i = 0; i < 80; i++) particles.push(new Particle());
 
   const animate = () => {
@@ -115,6 +115,79 @@ const getFormattedTime = () => {
   return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
 
+/* ── TOAST NOTIFICATIONS ─────────────────────── */
+const showToast = (title, message, type = 'success') => {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+
+  let icon = '✨';
+  if (type === 'success') icon = '✅';
+  else if (type === 'error') icon = '❌';
+  else if (type === 'warning') icon = '⚠️';
+  else if (type === 'info') icon = 'ℹ️';
+
+  toast.innerHTML = `
+    <div class="toast-icon">${icon}</div>
+    <div class="toast-content">
+      <div class="toast-title">${title}</div>
+      <div class="toast-message">${message}</div>
+    </div>
+  `;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add('fade-out');
+    setTimeout(() => {
+      toast.remove();
+    }, 300);
+  }, 4000);
+};
+
+/* ── LOCALSTORAGE STATE ───────────────────────── */
+const loadState = () => {
+  try {
+    const savedHistory = localStorage.getItem('reviewsense_history');
+    const savedStats = localStorage.getItem('reviewsense_stats');
+    
+    if (savedHistory) {
+      state.history = JSON.parse(savedHistory);
+    }
+    if (savedStats) {
+      const stats = JSON.parse(savedStats);
+      state.totalAnalyses = stats.totalAnalyses || 0;
+      state.positiveCount = stats.positiveCount || 0;
+      state.negativeCount = stats.negativeCount || 0;
+      state.neutralCount = stats.neutralCount || 0;
+      state.totalConfidence = stats.totalConfidence || 0;
+      state.reviewsToday = stats.reviewsToday || 0;
+      state.chartData = stats.chartData || state.chartData;
+    }
+  } catch (error) {
+    console.error('Error loading state from localStorage:', error);
+  }
+};
+
+const saveState = () => {
+  try {
+    localStorage.setItem('reviewsense_history', JSON.stringify(state.history));
+    localStorage.setItem('reviewsense_stats', JSON.stringify({
+      totalAnalyses: state.totalAnalyses,
+      positiveCount: state.positiveCount,
+      negativeCount: state.negativeCount,
+      neutralCount: state.neutralCount,
+      totalConfidence: state.totalConfidence,
+      reviewsToday: state.reviewsToday,
+      chartData: state.chartData
+    }));
+  } catch (error) {
+    console.error('Error saving state to localStorage:', error);
+  }
+};
+
 /* ── METRICS DISPLAY ENGINE ──────────────────── */
 const updateMetrics = () => {
   const totalEl = document.getElementById('totalAnalyses');
@@ -134,7 +207,7 @@ const updateMetrics = () => {
     totalEl.textContent = total < 10 ? '0' + total : total;
   }
   if (totalTrendEl) {
-    totalTrendEl.textContent = total > 0 ? `+${total} this session` : 'Waiting for data';
+    totalTrendEl.textContent = total > 0 ? `+${total} total synced` : 'Waiting for data';
     totalTrendEl.className = total > 0 ? 'stat-change positive' : 'stat-change neutral';
   }
 
@@ -231,7 +304,6 @@ textarea?.addEventListener('input', () => {
   else charCount.style.color = '';
 });
 
-// Ctrl+Enter shortcut
 textarea?.addEventListener('keydown', (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
     e.preventDefault();
@@ -245,55 +317,63 @@ document.querySelectorAll('.chip').forEach(chip => {
     textarea.value = chip.dataset.text;
     charCount.textContent = chip.dataset.text.length;
     
-    // Trigger typing state on container
     if (textareaContainer) {
       textareaContainer.classList.add('typing');
     }
     textarea.focus();
     
-    // Subtle glow pulse
     chip.classList.add('clicked');
     setTimeout(() => chip.classList.remove('clicked'), 500);
   });
 });
 
-/* ── SENTIMENT ANALYSIS ENGINE ───────────────── */
+/* ── BRAND SENTIMENT PRESENTATION STYLES ─────── */
 const sentimentRules = {
   positive: {
-    keywords: ['love', 'great', 'amazing', 'excellent', 'fantastic', 'wonderful', 'best', 'perfect', 'awesome', 'superb', 'outstanding', 'brilliant', 'delightful', 'impressed', 'satisfied', 'happy', 'pleased', 'fast delivery', 'recommend', 'quality', 'beautiful', 'incredible', 'good', 'helpful', 'nice', 'smooth', 'easy'],
-    tags: ['High Satisfaction', 'Positive Experience', 'Highly Recommended', 'Quality Standard'],
     color: 'var(--pink)',
+    tags: ['High Satisfaction', 'Positive Experience', 'Highly Recommended', 'Quality Standard'],
     summaries: [
       'Strong positive sentiment detected. Customer expresses high satisfaction and enthusiasm.',
       'Highly positive review with enthusiastic language. Likely to recommend.',
-      'Excellent sentiment score. Indicates strong product/service satisfaction.',
+      'Excellent sentiment score. Indicates strong product/service satisfaction.'
     ]
   },
   negative: {
-    keywords: ['worst', 'terrible', 'awful', 'horrible', 'useless', 'waste', 'broke', 'broken', 'disappointed', 'poor', 'bad', 'hate', 'never again', 'refund', 'scam', 'fake', 'misleading', 'slow', 'overpriced', 'cheap', 'fail', 'defect', 'damage', 'useless', 'error'],
-    tags: ['Critical Issue', 'Dissatisfaction', 'Escalation Alert', 'Refund Risk'],
     color: 'var(--red)',
+    tags: ['Critical Issue', 'Dissatisfaction', 'Escalation Alert', 'Refund Risk'],
     summaries: [
       'Strong negative sentiment. Customer is highly dissatisfied with product performance.',
       'Critical review with multiple negative signals. High customer attrition risk.',
-      'Negative experience detected. Immediate quality check suggested.',
+      'Negative experience detected. Immediate quality check suggested.'
     ]
   },
   neutral: {
-    keywords: ['okay', 'ok', "it's fine", 'average', 'decent', 'alright', 'not bad', 'could be better', 'so so', 'mediocre', 'moderate', 'fair', 'basic', 'standard', 'normal', 'medium'],
-    tags: ['Moderate Rating', 'Balanced Signals', 'Follow-up Recommended', 'Productive Feedback'],
     color: 'var(--blue)',
+    tags: ['Moderate Rating', 'Balanced Signals', 'Follow-up Recommended', 'Productive Feedback'],
     summaries: [
       'Neutral sentiment detected. Customer has no strong emotional polarity.',
       'Mixed or average review. Customer suggests functional satisfaction but limited impact.',
-      'Standard language detected. Moderate experience score.',
+      'Standard language detected. Moderate experience score.'
     ]
   }
 };
 
+/* ── API BASE URL CONFIGURATION ──────────────── */
+const getApiUrl = () => {
+  const savedUrl = localStorage.getItem('reviewsense_api_url');
+  if (savedUrl) return savedUrl;
+  
+  if (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://127.0.0.1:8000/predict';
+  }
+  return '/predict';
+};
+
+/* ── SENTIMENT ANALYSIS ENGINE ───────────────── */
 const analyze = async () => {
   const text = textarea.value.trim();
   if (!text) {
+    showToast('Empty Input', 'Please type or select a review to analyze.', 'warning');
     textarea.focus();
     if (textareaContainer) {
       textareaContainer.style.borderColor = 'rgba(255,45,120,0.6)';
@@ -302,7 +382,6 @@ const analyze = async () => {
     return;
   }
 
-  // Start loading states
   const btn = document.getElementById('analyzeBtn');
   const loading = document.getElementById('btnLoading');
   const cards = document.querySelectorAll('.glass-card');
@@ -313,86 +392,101 @@ const analyze = async () => {
     btn.disabled = true;
   }
 
-  // Visual Shimmer Effect on Cards while AI predicts
   cards.forEach(card => card.classList.add('shimmering'));
 
-  // Realistic AI Processing Delay
-  await new Promise(r => setTimeout(r, 1000 + Math.random() * 500));
+  let sentimentVal = '';
+  let confidenceVal = 0;
+  let success = false;
 
-  // Predictive scoring
-  const lower = text.toLowerCase();
-  let posScore = 0, negScore = 0, neutScore = 0;
+  const url = getApiUrl();
 
-  sentimentRules.positive.keywords.forEach(kw => { if (lower.includes(kw)) posScore += 1; });
-  sentimentRules.negative.keywords.forEach(kw => { if (lower.includes(kw)) negScore += 1; });
-  sentimentRules.neutral.keywords.forEach(kw => { if (lower.includes(kw)) neutScore += 1; });
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ review: text })
+    });
 
-  // Base values to prevent absolute zero division
-  posScore = Math.max(posScore, 0.1);
-  negScore = Math.max(negScore, 0.05);
-  neutScore = Math.max(neutScore, 0.1);
-
-  const totalScoreSum = posScore + negScore + neutScore;
-  const posPct = Math.round((posScore / totalScoreSum) * 100);
-  const negPct = Math.round((negScore / totalScoreSum) * 100);
-  const neutPct = 100 - posPct - negPct;
-
-  let sentimentLabel, rules, category;
-  if (posPct > negPct && posPct > neutPct) {
-    sentimentLabel = '😊 Positive';
-    rules = sentimentRules.positive;
-    category = 'positive';
-    state.positiveCount += 1;
-  } else if (negPct > posPct && negPct > neutPct) {
-    sentimentLabel = '😠 Negative';
-    rules = sentimentRules.negative;
-    category = 'negative';
-    state.negativeCount += 1;
-  } else {
-    sentimentLabel = '😐 Neutral';
-    rules = sentimentRules.neutral;
-    category = 'neutral';
-    state.neutralCount += 1;
+    if (response.ok) {
+      const data = await response.json();
+      sentimentVal = data.sentiment; 
+      confidenceVal = parseFloat(data.confidence);
+      success = true;
+    } else {
+      throw new Error(`Server returned status: ${response.status}`);
+    }
+  } catch (error) {
+    console.error('API connection failure:', error);
+    showToast('Connection Error', 'Could not reach the AI sentiment service. Please verify backend is running.', 'error');
   }
 
-  const topScore = Math.max(posPct, negPct, neutPct);
-  const confidence = Math.min(98, 62 + topScore * 0.35 + Math.random() * 5);
+  if (success) {
+    const category = sentimentVal.toLowerCase();
+    const confidence = Math.round(confidenceVal);
 
-  // Update State
-  state.totalAnalyses += 1;
-  state.reviewsToday += 1;
-  state.totalConfidence += confidence;
+    let posPct = 0, negPct = 0, neutPct = 0;
+    if (category === 'positive') {
+      posPct = confidence;
+      negPct = Math.round((100 - confidence) * 0.4);
+      neutPct = 100 - posPct - negPct;
+    } else if (category === 'negative') {
+      negPct = confidence;
+      posPct = Math.round((100 - confidence) * 0.3);
+      neutPct = 100 - negPct - posPct;
+    } else {
+      neutPct = confidence;
+      posPct = Math.round((100 - confidence) * 0.6);
+      negPct = 100 - neutPct - posPct;
+    }
 
-  // Add to History
-  const truncatedText = text.length > 80 ? text.slice(0, 78) + '…' : text;
-  state.history.unshift({
-    text: truncatedText,
-    sentiment: category.charAt(0).toUpperCase() + category.slice(1),
-    time: getFormattedTime()
-  });
+    state.totalAnalyses += 1;
+    state.reviewsToday += 1;
+    state.totalConfidence += confidence;
 
-  // Update Chart Data for Today
-  const todayDayName = getTodayDay();
-  state.chartData[todayDayName][category] += 1;
+    if (category === 'positive') state.positiveCount += 1;
+    else if (category === 'negative') state.negativeCount += 1;
+    else state.neutralCount += 1;
 
-  // Reset loading states
+    const truncatedText = text.length > 80 ? text.slice(0, 78) + '…' : text;
+    state.history.unshift({
+      text: truncatedText,
+      sentiment: category.charAt(0).toUpperCase() + category.slice(1),
+      time: getFormattedTime()
+    });
+
+    if (state.history.length > 50) {
+      state.history.pop();
+    }
+
+    const todayDayName = getTodayDay();
+    state.chartData[todayDayName][category] += 1;
+
+    saveState();
+
+    textarea.value = '';
+    charCount.textContent = '0';
+    textareaContainer?.classList.remove('typing');
+
+    updateMetrics();
+    
+    const sentimentEmojiLabel = category === 'positive' ? '😊 Positive' : category === 'negative' ? '😠 Negative' : '😐 Neutral';
+    const rules = sentimentRules[category];
+    
+    updateResult(sentimentEmojiLabel, rules, confidence, posPct, negPct, neutPct);
+    renderHistory();
+    if (redrawChart) redrawChart();
+
+    showToast('Analysis Succeeded', `Sentiment: ${sentimentVal} (${confidence}% Conf)`, 'success');
+  }
+
   if (btn && loading) {
     btn.classList.remove('loading');
     loading.classList.remove('active');
     btn.disabled = false;
   }
   cards.forEach(card => card.classList.remove('shimmering'));
-
-  // Reset Textarea
-  textarea.value = '';
-  charCount.textContent = '0';
-  textareaContainer?.classList.remove('typing');
-
-  // Trigger UI Redraws
-  updateMetrics();
-  updateResult(sentimentLabel, rules, confidence, posPct, negPct, neutPct);
-  renderHistory();
-  if (redrawChart) redrawChart();
 };
 
 const updateResult = (sentiment, rules, confidence, pos, neg, neut) => {
@@ -500,7 +594,6 @@ let redrawChart = () => {};
     const n = days.length;
     const stepX = chartW / (n - 1);
 
-    // 1. Grid lines
     for (let i = 0; i <= 4; i++) {
       const y = padT + (chartH / 4) * i;
       ctx.beginPath();
@@ -516,7 +609,6 @@ let redrawChart = () => {};
       ctx.fillText((100 - i * 25) + '%', padL - 8, y + 3.5);
     }
 
-    // 2. X labels
     ctx.textAlign = 'center';
     days.forEach((d, i) => {
       ctx.fillStyle = 'rgba(255,255,255,0.22)';
@@ -524,7 +616,6 @@ let redrawChart = () => {};
       ctx.fillText(d, padL + i * stepX, H - 8);
     });
 
-    // 3. Render placeholder text if no analyses yet
     if (state.totalAnalyses === 0) {
       ctx.fillStyle = 'rgba(255,255,255,0.28)';
       ctx.font = '500 12.5px Inter, sans-serif';
@@ -532,7 +623,6 @@ let redrawChart = () => {};
       return;
     }
 
-    // Calculate percentage distributions per day
     const positive = days.map(d => {
       const dayData = state.chartData[d];
       const total = dayData.positive + dayData.negative + dayData.neutral;
@@ -555,7 +645,6 @@ let redrawChart = () => {};
         y: padT + chartH - (v / 100) * chartH
       }));
 
-      // Gradient area fill
       const grad = ctx.createLinearGradient(0, padT, 0, padT + chartH);
       const startColor = color.includes('var') 
         ? (color.includes('pink') ? 'rgba(255,45,120,0.18)' : color.includes('red') ? 'rgba(255,26,74,0.18)' : 'rgba(59,130,246,0.18)')
@@ -575,7 +664,6 @@ let redrawChart = () => {};
       ctx.fillStyle = grad;
       ctx.fill();
 
-      // Core Line
       ctx.beginPath();
       ctx.moveTo(pts[0].x, pts[0].y);
       for (let i = 1; i < pts.length; i++) {
@@ -588,7 +676,6 @@ let redrawChart = () => {};
       ctx.stroke();
       ctx.globalAlpha = 1;
 
-      // Glow points (only if day has data)
       pts.forEach((pt, i) => {
         const d = days[i];
         const dayTotal = state.chartData[d].positive + state.chartData[d].negative + state.chartData[d].neutral;
@@ -624,13 +711,15 @@ document.addEventListener('keydown', (e) => {
 
 /* ── INITIALIZATION ──────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
-  // Page load delays
+  loadState();
+
   document.querySelectorAll('.glass-card').forEach((card, i) => {
     card.style.animationDelay = `${0.1 + i * 0.05}s`;
   });
   
-  // Set up initial dashboard metrics and history
   updateMetrics();
   renderHistory();
-  animateRing(0);
+
+  const initialAvgConf = state.totalAnalyses > 0 ? Math.round(state.totalConfidence / state.totalAnalyses) : 0;
+  animateRing(initialAvgConf);
 });
