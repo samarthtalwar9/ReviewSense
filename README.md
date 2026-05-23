@@ -37,6 +37,30 @@ ReviewSense is a production-level, high-performance AI Sentiment Intelligence da
 
 ---
 
+## 🏛️ System Architecture
+
+ReviewSense separates presentation concerns from inference servers using a lightweight, decoupled request-response flow:
+
+```mermaid
+graph TD
+    A[User Input: Raw Review Text] -->|1. Submit / Ctrl+Enter| B(Frontend Dashboard: script.js)
+    B -->|2. HTTP POST with AbortController| C(FastAPI Gateway: app.py)
+    C -->|3. Preprocessing| D[Text Normalization: utils.py]
+    D -->|4. Feature Extraction| E[TF-IDF Vectorizer: vectorizer.pkl]
+    E -->|5. Predict class probabilities| F[Logistic Regression Model: model.pkl]
+    F -->|6. Compile Output payload| C
+    C -->|7. JSON Response| B
+    B -->|8. Animate Gauges & Update UI| G[Weekly Charts, History, localState]
+```
+
+1. **Client-side Submission:** The user inputs text or selects a chip. The click triggers loading indicators and starts card shimmers.
+2. **API Endpoint Resolution:** The client checks for custom URL definitions in `localStorage` before defaulting to localhost in development or relative paths in production.
+3. **Data Preprocessing:** The backend converts review text to lowercase and scrubs punctuation and digits.
+4. **Vectorization & Prediction:** Normalized strings are converted into word-frequency vectors via a pre-fit `TfidfVectorizer` and classified across multinomial outputs using a `LogisticRegression` model.
+5. **Score Compilation:** Probability vectors are parsed to output the top prediction label and score confidence ratio (%).
+
+---
+
 ## 📂 Folder Structure
 
 ```text
@@ -63,6 +87,7 @@ ReviewSense/
 │   ├── vectorizer.pkl      # Serialized TF-IDF Vectorizer pickle
 │   ├── requirements.txt    # Python packages list
 │   ├── Procfile            # Cloud hosting server command configuration
+│   ├── .env.example        # Environment variables configuration example
 │   │
 │   └── dataset/
 │       └── reviews.csv     # Training dataset of labeled customer reviews
@@ -175,6 +200,27 @@ Ensure you have **Python 3.9+** and a modern web browser installed.
    - **Build Command:** `pip install -r requirements.txt`
    - **Start Command:** `gunicorn -w 4 -k uvicorn.workers.UvicornWorker app:app`
    - **Root Directory:** `backend/`
+
+---
+
+## 🤝 Contributing Guidelines
+
+Contributions are welcome! If you'd like to improve the dashboard or classification features:
+
+1. **Fork** the Repository.
+2. Create a feature branch:
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
+3. Commit your modifications:
+   ```bash
+   git commit -m "Add some amazing features"
+   ```
+4. Push changes to the branch:
+   ```bash
+   git push origin feature/amazing-feature
+   ```
+5. Open a **Pull Request**.
 
 ---
 

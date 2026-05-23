@@ -1,0 +1,4 @@
+Save dashboard screenshots and banners in this folder (frontend/assets/images/) to embed them into your GitHub repository README.md.
+Recommended naming convention:
+- dashboard_preview.png
+- mobile_responsive.png

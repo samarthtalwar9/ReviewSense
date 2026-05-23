@@ -11,10 +11,13 @@ app = FastAPI(
     version="1.0"
 )
 
-# Enable CORS for flexible frontend deployment (e.g., static hosting on Vercel)
+# Load CORS origins from environment variables (default to '*' if not specified)
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "*")
+allowed_origins = [origin.strip() for origin in allowed_origins_env.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust in production to restrict to specific origins
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
