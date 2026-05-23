@@ -1,0 +1,6 @@
+Save dashboard screenshots in this directory (frontend/assets/screenshots/) to embed them into developer portfolios or readme documents.
+Recommended captures:
+- desktop_screenshot.png (Main dashboard view on laptop/desktop)
+- mobile_screenshot.png (Sidebar collapsed, responsive grid elements on mobile)
+- loading_state.png (Active spinner buttons & card shimmer visual triggers)
+- analytics_trends.png (Graph nodes representing weekly sentiment distributions)

@@ -373,12 +373,19 @@ const sentimentRules = {
 
 /* ── API BASE URL CONFIGURATION ──────────────── */
 const getApiUrl = () => {
+  // 1. LocalStorage overrides (useful for testing alternative APIs via console)
   const savedUrl = localStorage.getItem('reviewsense_api_url');
   if (savedUrl) return savedUrl;
   
-  if (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    return 'http://127.0.0.1:8000/predict';
+  // 2. Load from centralized window config object if available
+  if (window.ENV_CONFIG && window.ENV_CONFIG.API_BASE_URL) {
+    // If local dev or relative resolution disabled, return config URL
+    if (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || !window.ENV_CONFIG.AUTO_RESOLVE_RELATIVE) {
+      return window.ENV_CONFIG.API_BASE_URL;
+    }
   }
+  
+  // 3. Absolute relative path fallback for unified root/vercel configurations
   return '/predict';
 };
 
