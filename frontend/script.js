@@ -618,16 +618,73 @@ let redrawChart = () => {};
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
 
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  // Current interpolated values for smooth transitions
+  let currentPos = [0, 0, 0, 0, 0, 0, 0];
+  let currentNeg = [0, 0, 0, 0, 0, 0, 0];
+  let currentNeut = [0, 0, 0, 0, 0, 0, 0];
+
+  let animFrameId = null;
+
   const resizeCanvas = () => {
     const rect = canvas.parentElement.getBoundingClientRect();
     canvas.width = rect.width;
     canvas.height = rect.height;
-    draw();
+    triggerDraw();
   };
 
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const triggerDraw = () => {
+    // Cancel previous animations
+    if (animFrameId) cancelAnimationFrame(animFrameId);
+    
+    // Extract target values from current state
+    const targetPos = days.map(d => {
+      const dayData = state.chartData[d];
+      const total = dayData.positive + dayData.negative + dayData.neutral;
+      return total > 0 ? Math.round((dayData.positive / total) * 100) : 0;
+    });
+    const targetNeg = days.map(d => {
+      const dayData = state.chartData[d];
+      const total = dayData.positive + dayData.negative + dayData.neutral;
+      return total > 0 ? Math.round((dayData.negative / total) * 100) : 0;
+    });
+    const targetNeut = days.map(d => {
+      const dayData = state.chartData[d];
+      const total = dayData.positive + dayData.negative + dayData.neutral;
+      return total > 0 ? Math.round((dayData.neutral / total) * 100) : 0;
+    });
 
-  const draw = () => {
+    const animate = () => {
+      let active = false;
+      const ease = 0.08; // Easing speed
+
+      for (let i = 0; i < 7; i++) {
+        const diffPos = targetPos[i] - currentPos[i];
+        const diffNeg = targetNeg[i] - currentNeg[i];
+        const diffNeut = targetNeut[i] - currentNeut[i];
+
+        if (Math.abs(diffPos) > 0.1) { currentPos[i] += diffPos * ease; active = true; }
+        else { currentPos[i] = targetPos[i]; }
+
+        if (Math.abs(diffNeg) > 0.1) { currentNeg[i] += diffNeg * ease; active = true; }
+        else { currentNeg[i] = targetNeg[i]; }
+
+        if (Math.abs(diffNeut) > 0.1) { currentNeut[i] += diffNeut * ease; active = true; }
+        else { currentNeut[i] = targetNeut[i]; }
+      }
+
+      renderCanvas(currentPos, currentNeg, currentNeut);
+
+      if (active) {
+        animFrameId = requestAnimationFrame(animate);
+      }
+    };
+
+    animate();
+  };
+
+  const renderCanvas = (posData, negData, neutData) => {
     const W = canvas.width;
     const H = canvas.height;
     ctx.clearRect(0, 0, W, H);
@@ -638,6 +695,7 @@ let redrawChart = () => {};
     const n = days.length;
     const stepX = chartW / (n - 1);
 
+    // Draw Y-axis grid lines and labels
     for (let i = 0; i <= 4; i++) {
       const y = padT + (chartH / 4) * i;
       ctx.beginPath();
@@ -653,6 +711,7 @@ let redrawChart = () => {};
       ctx.fillText((100 - i * 25) + '%', padL - 8, y + 3.5);
     }
 
+    // Draw X-axis day labels
     ctx.textAlign = 'center';
     days.forEach((d, i) => {
       ctx.fillStyle = 'rgba(255,255,255,0.22)';
@@ -667,28 +726,13 @@ let redrawChart = () => {};
       return;
     }
 
-    const positive = days.map(d => {
-      const dayData = state.chartData[d];
-      const total = dayData.positive + dayData.negative + dayData.neutral;
-      return total > 0 ? Math.round((dayData.positive / total) * 100) : 0;
-    });
-    const negative = days.map(d => {
-      const dayData = state.chartData[d];
-      const total = dayData.positive + dayData.negative + dayData.neutral;
-      return total > 0 ? Math.round((dayData.negative / total) * 100) : 0;
-    });
-    const neutral = days.map(d => {
-      const dayData = state.chartData[d];
-      const total = dayData.positive + dayData.negative + dayData.neutral;
-      return total > 0 ? Math.round((dayData.neutral / total) * 100) : 0;
-    });
-
     const drawLine = (data, color, alpha = 0.8) => {
       const pts = data.map((v, i) => ({
         x: padL + i * stepX,
         y: padT + chartH - (v / 100) * chartH
       }));
 
+      // Draw Gradient Area Fill under the bezier line
       const grad = ctx.createLinearGradient(0, padT, 0, padT + chartH);
       const startColor = color.includes('var') 
         ? (color.includes('pink') ? 'rgba(255,45,120,0.18)' : color.includes('red') ? 'rgba(255,26,74,0.18)' : 'rgba(59,130,246,0.18)')
@@ -708,6 +752,7 @@ let redrawChart = () => {};
       ctx.fillStyle = grad;
       ctx.fill();
 
+      // Draw the Bezier Line Stroke itself
       ctx.beginPath();
       ctx.moveTo(pts[0].x, pts[0].y);
       for (let i = 1; i < pts.length; i++) {
@@ -720,6 +765,7 @@ let redrawChart = () => {};
       ctx.stroke();
       ctx.globalAlpha = 1;
 
+      // Draw interactive nodes (dots) representing active days
       pts.forEach((pt, i) => {
         const d = days[i];
         const dayTotal = state.chartData[d].positive + state.chartData[d].negative + state.chartData[d].neutral;
@@ -735,12 +781,12 @@ let redrawChart = () => {};
       });
     };
 
-    drawLine(neutral,  'var(--blue)', 0.7);
-    drawLine(negative, 'var(--red)', 0.7);
-    drawLine(positive, 'var(--pink)', 0.85);
+    drawLine(neutData, 'var(--blue)', 0.7);
+    drawLine(negData,  'var(--red)', 0.7);
+    drawLine(posData,  'var(--pink)', 0.85);
   };
 
-  redrawChart = draw;
+  redrawChart = triggerDraw;
   window.addEventListener('resize', resizeCanvas);
   setTimeout(resizeCanvas, 100);
 })();
