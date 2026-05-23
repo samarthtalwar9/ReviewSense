@@ -61,6 +61,18 @@ graph TD
 
 ---
 
+## 📷 Screenshots & Demo
+
+| Desktop Dashboard View | Collapsible Sidebar (Mobile) |
+| :---: | :---: |
+| ![Desktop Overview](frontend/assets/screenshots/desktop_screenshot.png) | ![Mobile View](frontend/assets/screenshots/mobile_screenshot.png) |
+
+| AI Loading State | Analytics Trend Canvas |
+| :---: | :---: |
+| ![Loading State](frontend/assets/screenshots/loading_state.png) | ![Analytics Canvas](frontend/assets/screenshots/analytics_trends.png) |
+
+---
+
 ## 📂 Folder Structure
 
 ```text
