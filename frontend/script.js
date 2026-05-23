@@ -405,11 +405,16 @@ const analyze = async () => {
   const btn = document.getElementById('analyzeBtn');
   const loading = document.getElementById('btnLoading');
   const cards = document.querySelectorAll('.glass-card');
+  const aiOverlay = document.getElementById('aiLoadingOverlay');
   
   if (btn && loading) {
     btn.classList.add('loading');
     loading.classList.add('active');
     btn.disabled = true;
+  }
+  
+  if (aiOverlay) {
+    aiOverlay.classList.add('active');
   }
 
   // Trigger smooth card shimmers
@@ -531,6 +536,9 @@ const analyze = async () => {
     btn.disabled = false;
   }
   cards.forEach(card => card.classList.remove('shimmering'));
+  if (aiOverlay) {
+    aiOverlay.classList.remove('active');
+  }
 };
 
 const updateResult = (sentiment, rules, confidence, pos, neg, neut) => {
