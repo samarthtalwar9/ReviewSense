@@ -6,7 +6,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Scikit-Learn](https://img.shields.io/badge/scikit_learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)](https://scikit-learn.org)
 
-ReviewSense is a production-level, high-performance AI Sentiment Intelligence dashboard designed to analyze, track, and visualize customer review polarities in real-time. Built with a futuristic glassmorphic UI design system, it features a modular architecture separating a clean client-side dashboard from a FastAPI deep-learning prediction server.
+ReviewSense is a production-level, high-performance AI Sentiment Intelligence dashboard designed to analyze, track, and visualize customer review polarities in real-time. Built with a futuristic glassmorphic UI design system, it features a modular architecture separating a clean client-side dashboard from a FastAPI machine learning prediction server.
 
 ---
 
@@ -19,7 +19,7 @@ ReviewSense is a production-level, high-performance AI Sentiment Intelligence da
 - **Local Persistence:** Retains full application states, analysis histories, and daily stats charts between page loads using `localStorage`.
 - **Flexible Cross-Origin Operations:** Built-in CORS routing on the backend API allowing multi-domain web communication (e.g. Vercel frontend + Render backend).
 - **Intelligent API Config Resolver:** Automatically switches between dev localhost endpoints and deployed cloud hosts depending on the environment.
-- **Robust Exception Handling:** Integrated `AbortController` request timeout monitoring (8s limit) and detailed network exception visual alerts.
+- **Robust Exception Handling:** Integrated `AbortController` request timeout monitoring and detailed network exception visual alerts.
 
 ---
 
@@ -28,48 +28,30 @@ ReviewSense is a production-level, high-performance AI Sentiment Intelligence da
 ### Frontend
 - **Structure:** Semantic HTML5
 - **Styling:** Custom Vanilla CSS3 (Custom Variables, Keyframe Animations, Glassmorphism Filters)
-- **Logic:** Vanilla ES6+ JavaScript (HTML5 Canvas Engine, Fetch API, LocalStorage Interface, AbortController)
+- **Logic:** Vanilla ES6+ JavaScript (Canvas Engine, Fetch API, LocalStorage, AbortController)
 
 ### Backend
 - **Framework:** FastAPI (Python 3.10+)
-- **ML / Data Science:** Scikit-Learn (TF-IDF Vectorization, Logistic Regression Classifier), Pandas, NumPy
-- **Server Gateway:** Uvicorn / Gunicorn
+- **Machine Learning:** Scikit-Learn
+- **NLP:** TF-IDF Vectorization + Logistic Regression
+- **Libraries:** Pandas, NumPy, NLTK
+- **Server:** Uvicorn
 
 ---
 
 ## 🏛️ System Architecture
 
-ReviewSense separates presentation concerns from inference servers using a lightweight, decoupled request-response flow:
-
 ```mermaid
 graph TD
-    A[User Input: Raw Review Text] -->|1. Submit / Ctrl+Enter| B(Frontend Dashboard: script.js)
-    B -->|2. HTTP POST with AbortController| C(FastAPI Gateway: app.py)
-    C -->|3. Preprocessing| D[Text Normalization: utils.py]
-    D -->|4. Feature Extraction| E[TF-IDF Vectorizer: vectorizer.pkl]
-    E -->|5. Predict class probabilities| F[Logistic Regression Model: model.pkl]
-    F -->|6. Compile Output payload| C
-    C -->|7. JSON Response| B
-    B -->|8. Animate Gauges & Update UI| G[Weekly Charts, History, localState]
+    A[User Input: Raw Review Text] -->|1. Submit Review| B(Frontend Dashboard)
+    B -->|2. POST Request| C(FastAPI Backend)
+    C -->|3. Preprocessing| D[utils.py]
+    D -->|4. TF-IDF Vectorization| E[vectorizer.pkl]
+    E -->|5. Sentiment Prediction| F[model.pkl]
+    F -->|6. JSON Response| C
+    C -->|7. API Response| B
+    B -->|8. Update UI & Charts| G[Dashboard Analytics]
 ```
-
-1. **Client-side Submission:** The user inputs text or selects a chip. The click triggers loading indicators and starts card shimmers.
-2. **API Endpoint Resolution:** The client checks for custom URL definitions in `localStorage` before defaulting to localhost in development or relative paths in production.
-3. **Data Preprocessing:** The backend converts review text to lowercase and scrubs punctuation and digits.
-4. **Vectorization & Prediction:** Normalized strings are converted into word-frequency vectors via a pre-fit `TfidfVectorizer` and classified across multinomial outputs using a `LogisticRegression` model.
-5. **Score Compilation:** Probability vectors are parsed to output the top prediction label and score confidence ratio (%).
-
----
-
-## 📷 Screenshots & Demo
-
-| Desktop Dashboard View | Collapsible Sidebar (Mobile) |
-| :---: | :---: |
-| ![Desktop Overview](frontend/assets/screenshots/desktop_screenshot.png) | ![Mobile View](frontend/assets/screenshots/mobile_screenshot.png) |
-
-| AI Loading State | Analytics Trend Canvas |
-| :---: | :---: |
-| ![Loading State](frontend/assets/screenshots/loading_state.png) | ![Analytics Canvas](frontend/assets/screenshots/analytics_trends.png) |
 
 ---
 
@@ -79,178 +61,236 @@ graph TD
 ReviewSense/
 │
 ├── frontend/
-│   ├── index.html          # Main dashboard structural shell
-│   ├── style.css           # Cinematic CSS design tokens & animations
-│   ├── script.js            # Core interactive logic and API connectors
+│   ├── index.html
+│   ├── style.css
+│   ├── script.js
+│   ├── config.js
 │   │
-│   ├── assets/             # Media and styling resources
+│   ├── assets/
 │   │   ├── icons/
 │   │   ├── images/
 │   │   ├── fonts/
 │   │   └── animations/
 │   │
-│   └── components/         # Placeholder for future modular JS structures
+│   └── components/
 │
 ├── backend/
-│   ├── app.py              # FastAPI server endpoints & CORS policies
-│   ├── train_model.py      # ML Model training and serialization script
-│   ├── utils.py            # Preprocessing text utility functions
-│   ├── model.pkl           # Serialized Logistic Regression model pickle
-│   ├── vectorizer.pkl      # Serialized TF-IDF Vectorizer pickle
-│   ├── requirements.txt    # Python packages list
-│   ├── Procfile            # Cloud hosting server command configuration
-│   ├── .env.example        # Environment variables configuration example
+│   ├── app.py
+│   ├── train_model.py
+│   ├── utils.py
+│   ├── model.pkl
+│   ├── vectorizer.pkl
+│   ├── requirements.txt
+│   ├── Procfile
+│   ├── .env.example
 │   │
 │   └── dataset/
-│       └── reviews.csv     # Training dataset of labeled customer reviews
+│       └── reviews.csv
 │
-├── README.md               # Project documentation
-├── .gitignore              # Repository file exclusion rules
-└── LICENSE                 # Open-source MIT License
+├── README.md
+├── .gitignore
+└── LICENSE
 ```
 
 ---
 
 ## 🔧 Installation & Local Setup
 
-### Prerequisite
-Ensure you have **Python 3.9+** and a modern web browser installed.
+### Prerequisites
+
+- Python 3.9+
+- Modern Web Browser
+- Git
 
 ---
 
-### 1. Backend Setup
+## ⚙️ Backend Setup
 
-1. **Navigate to the backend directory:**
-   ```bash
-   cd backend
-   ```
+### 1. Navigate to Backend
 
-2. **Create and activate a virtual environment:**
-   * **Windows (PowerShell):**
-     ```powershell
-     python -m venv venv
-     .\venv\Scripts\Activate.ps1
-     ```
-   * **macOS / Linux:**
-     ```bash
-     python3 -m venv venv
-     source venv/bin/activate
-     ```
+```bash
+cd backend
+```
 
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+### 2. Create Virtual Environment
 
-4. **(Optional) Retrain the Machine Learning model:**
-   You can run the pipeline to process the CSV dataset and rebuild `model.pkl` and `vectorizer.pkl`:
-   ```bash
-   python train_model.py
-   ```
+#### Windows
 
-5. **Start the FastAPI local development server:**
-   ```bash
-   uvicorn app:app --reload --host 127.0.0.1 --port 8000
-   ```
-   The backend API will run at `http://127.0.0.1:8000`. You can inspect the interactive OpenAPI documentation at `http://127.0.0.1:8000/docs`.
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
+
+#### macOS/Linux
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Train ML Model (Optional)
+
+```bash
+python train_model.py
+```
+
+### 5. Start FastAPI Server
+
+```bash
+uvicorn app:app --reload --host 127.0.0.1 --port 8000
+```
+
+Backend API:
+```text
+http://127.0.0.1:8000
+```
+
+Swagger Docs:
+```text
+http://127.0.0.1:8000/docs
+```
 
 ---
 
-### 2. Frontend Setup
+## 💻 Frontend Setup
 
-1. Open a new terminal session or navigate to the frontend folder.
-2. Since the frontend is composed of native HTML/CSS/JS, you do not need to install packages or compile assets.
-3. Open `frontend/index.html` directly in your browser or run a simple local web server:
-   * **Python SimpleServer:**
-     ```bash
-     cd frontend
-     python -m http.server 3000
-     ```
-     Access the dashboard at `http://localhost:3000`.
+### Run Local Frontend Server
+
+```bash
+cd frontend
+python -m http.server 3000
+```
+
+Open:
+```text
+http://localhost:3000
+```
 
 ---
 
 ## 🌐 API Endpoint Usage
 
 ### Predict Sentiment
-- **Method:** `POST`
-- **Path:** `/predict`
-- **Headers:** `Content-Type: application/json`
-- **Request Payload:**
-  ```json
-  {
-    "review": "I absolutely love using this new software! It is fast and responsive."
-  }
-  ```
-- **Response Format:**
-  ```json
-  {
-    "sentiment": "Positive",
-    "confidence": 98.42
-  }
-  ```
+
+#### Endpoint
+
+```http
+POST /predict
+```
+
+#### Request
+
+```json
+{
+  "review": "This product is amazing!"
+}
+```
+
+#### Response
+
+```json
+{
+  "sentiment": "Positive",
+  "confidence": 98.42
+}
+```
 
 ---
 
 ## ☁️ Deployment Guide
 
-### Frontend (Vercel)
-1. Install the Vercel CLI or link your GitHub repository to [Vercel](https://vercel.com).
-2. Configure the **Build & Development Settings**:
-   - **Framework Preset:** `Other` (Static HTML site)
-   - **Root Directory:** `frontend/`
-3. If deploying the backend separately, you can override the target endpoint by adding the backend's Render/cloud URL to `localStorage` under `reviewsense_api_url` in your browser console:
-   ```javascript
-   localStorage.setItem('reviewsense_api_url', 'https://your-backend-service.onrender.com/predict');
-   ```
+### Frontend Deployment (Vercel)
 
-### Backend (Render)
-1. Create a new **Web Service** on [Render](https://render.com).
-2. Connect your GitHub repository.
-3. Configure the environment variables:
-   - **Runtime:** `Python 3`
-   - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `gunicorn -w 4 -k uvicorn.workers.UvicornWorker app:app`
-   - **Root Directory:** `backend/`
+1. Import GitHub repository into Vercel.
+2. Configure:
+   - Framework Preset → `Other`
+   - Root Directory → `frontend`
+3. Deploy.
 
 ---
 
-## 🤝 Contributing Guidelines
+### Backend Deployment (Render)
 
-Contributions are welcome! If you'd like to improve the dashboard or classification features:
+1. Create a new Web Service on Render.
+2. Connect your GitHub repository.
+3. Configure:
+   - Runtime → `Python 3`
+   - Root Directory → `backend`
+   - Build Command →
+     ```bash
+     pip install -r requirements.txt
+     ```
+   - Start Command →
+     ```bash
+     uvicorn app:app --host 0.0.0.0 --port 10000
+     ```
 
-1. **Fork** the Repository.
-2. Create a feature branch:
-   ```bash
-   git checkout -b feature/amazing-feature
-   ```
-3. Commit your modifications:
-   ```bash
-   git commit -m "Add some amazing features"
-   ```
-4. Push changes to the branch:
-   ```bash
-   git push origin feature/amazing-feature
-   ```
-5. Open a **Pull Request**.
+---
+
+
+
+## 🔗 Live Deployment
+
+### Frontend
+```text
+https://your-vercel-app.vercel.app
+```
+
+### Backend API
+```text
+https://reviewsense-ic19.onrender.com
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome.
+
+### Steps
+
+```bash
+git fork
+git checkout -b feature/amazing-feature
+git commit -m "Added amazing feature"
+git push origin feature/amazing-feature
+```
+
+Then open a Pull Request.
 
 ---
 
 ## 🔮 Future Improvements
 
-- **Interactive API Endpoint Setter:** Add a settings modal inside the dashboard to let users paste their backend URL directly from the interface.
-- **Deep Language Models:** Port the model pipeline to use transformer models (e.g. HuggingFace DistilBERT) for nuanced context understanding.
-- **Database Integration:** Connect reviews history to PostgreSQL or MongoDB for multi-user session storage.
-- **Bulk CSV Uploads:** Enable users to import csv batches of comments and output a unified sentiment analytics report.
+- Transformer Models (BERT / DistilBERT)
+- Database Integration
+- CSV Bulk Uploads
+- User Authentication
+- Real-Time Analytics Engine
+- Admin Dashboard
+- Multi-language Sentiment Detection
+
+---
+
+## 🌐 Deployment Note
+
+This project uses **Render's free hosting tier** for the FastAPI backend.  
+Because free instances automatically go to sleep after inactivity, the **first prediction request may take around 30–60 seconds** while the server wakes up.
+
+✨ Once the backend becomes active, all subsequent requests respond much faster with normal real-time performance.
 
 ---
 
 ## 💳 Credits
 
-Developed by **Samarth Talwar**.
-
+Developed by **Samarth Talwar**
 ---
-
 <p align="center">
-  <b>Project by Samarth Talwar</b>
+  <b>⚡ Project by Samarth Talwar ⚡</b>
 </p>
