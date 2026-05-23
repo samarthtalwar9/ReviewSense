@@ -426,9 +426,19 @@ const analyze = async () => {
 
   const url = getApiUrl();
   
-  // Abort controller for timeouts
+  // Abort controller for timeouts - increased to 60 seconds for Render cold starts
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 8000);
+  const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+  // Dynamic loading messages for Render cold start
+  const subtitleEl = document.querySelector('.ai-loading-subtitle');
+  const originalSubtitle = subtitleEl ? subtitleEl.textContent : "Processing neural networks & mapping semantic weights...";
+  
+  const wakeUpTimeoutId = setTimeout(() => {
+    if (subtitleEl) {
+      subtitleEl.textContent = "Waking up AI server... This may take a few seconds on first request.";
+    }
+  }, 3000);
 
   try {
     const response = await fetch(url, {
@@ -441,6 +451,7 @@ const analyze = async () => {
     });
 
     clearTimeout(timeoutId);
+    clearTimeout(wakeUpTimeoutId);
 
     if (response.ok) {
       const data = await response.json();
@@ -458,12 +469,18 @@ const analyze = async () => {
     }
   } catch (error) {
     clearTimeout(timeoutId);
+    clearTimeout(wakeUpTimeoutId);
     console.error('API connection failure:', error);
     
     if (error.name === 'AbortError') {
       showToast('API Timeout', 'The analysis request timed out. Please try again.', 'error');
     } else {
       showToast('Connection Error', 'Could not reach the AI sentiment service. Ensure backend is running.', 'error');
+    }
+  } finally {
+    // Restore original loading subtitle text for next requests
+    if (subtitleEl) {
+      subtitleEl.textContent = originalSubtitle;
     }
   }
 
